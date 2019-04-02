@@ -5,14 +5,13 @@
   "main": "index.js",
   "scripts": {
     "generate": "node generator.js",
-    "start": "node cleaner.js"
+    "start": "node runner.js"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
     "@ronomon/utimes": "^2.3.1",
     "bluebird": "^3.5.3",
-    "readdirp": "^2.2.1",
     "rimraf": "^2.6.3"
   }
 }
