@@ -16,5 +16,5 @@
 
 ### Customization
 
-You can modify the constants in `cleaner.js` and `generate.js`.
+You can modify the constants in `runner.js` and `generate.js`.
 
