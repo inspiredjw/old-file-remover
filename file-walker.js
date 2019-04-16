@@ -26,32 +26,42 @@ class FileWalker {
             objectMode: this.options.objectMode,
         });
         this.count = 0;
+        this.recursiveCount = 0;
 
-        this.run();
+        this.run(this.rootDir);
     }
 
-    async run() {
-        const dirs = await readdir(this.rootDir);
+    async run(root) {
+        const rootStat = await stat(root);
+
+        if (!(rootStat.isDirectory())) {
+            return;
+        }
+
+        const dirs = await readdir(root);
 
         for (let i = 0; i < dirs.length; i++) {
             const dir = dirs[i];
-            const fulldir = path.join(this.rootDir, dir);
-            const files = await readdir(fulldir);
+            const fullpath = path.join(root, dir);
 
-            for (let j = 0 ; j < files.length; j++) {
-                const file = files[j];
-                const fullfile = path.join(fulldir, file);
-                const st = await stat(fullfile);
-                st.filepath = fullfile;
+            const st = await stat(fullpath);
+
+            if (st.isDirectory()) {
+                this.recursiveCount++;
+                await this.run(fullpath);
+                this.recursiveCount--;
+            } else {
+                st.filepath = fullpath;
                 this.stream.push(st);
-
-                await this.counter();
             }
+
             await this.counter();
         }
 
-        this.stream.emit("end");
-        this.stream.destroy();
+        if (this.recursiveCount === 0) {
+            this.stream.emit("end");
+            this.stream.destroy();
+        }
     }
 
     async counter() {
